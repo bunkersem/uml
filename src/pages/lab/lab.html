@@ -1,0 +1,25 @@
+
+<ion-header>
+    <ion-navbar>
+      <button ion-button menuToggle>
+        <ion-icon name="menu"></ion-icon>
+      </button>
+      <ion-title>Diagram Lab</ion-title>
+    </ion-navbar>
+  </ion-header>
+
+
+<ion-content padding>
+  <diagram></diagram>
+  <ion-fab bottom right>
+      <button ion-fab color="primary">
+        <ion-icon name="planet"></ion-icon>
+      </button>
+      <ion-fab-list side="top">
+        <button (click)="handleFabNewButton($event)" color="secondary" ion-fab><ion-icon name="add"></ion-icon></button>
+        <button color="light" ion-fab><ion-icon name="resize"></ion-icon></button>
+        <button color="danger" ion-fab><ion-icon name="color-wand"></ion-icon></button>
+        <button color="dark" ion-fab><ion-icon name="color-wand"></ion-icon></button>
+      </ion-fab-list>
+    </ion-fab>
+</ion-content>
