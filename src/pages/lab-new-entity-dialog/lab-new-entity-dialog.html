@@ -7,19 +7,50 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>lab-new-entity-dialog</ion-title>
+    <ion-title>New Entity</ion-title>
   </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
-  <form (ngSubmit)="newEntitySubmit($event)">
+  <form #form="ngForm" (ngSubmit)="createEntity(form)" (keypress)="formKeyPress($event)">
     <ion-item>
       <ion-label>Entiy Type</ion-label>
-      <ion-select name="entityType">
+      <ion-select name="entityEntityType" pattern="[a-zA-Z0-9_]*" required [(ngModel)]="entity.entityType">
         <ion-option *ngFor="let entityType of entityTypes">{{entityType}}</ion-option>
       </ion-select>
     </ion-item>
+    <ion-item>
+        <ion-label>Name</ion-label>
+      <ion-input name="entityName" type="text" pattern="[a-zA-Z0-9_]*" required [(ngModel)]="entity.name"></ion-input>
+    </ion-item>
+    <button type="button" ion-button (click)="addField($event)">Add Field</button>
+    <div>
+      <div>
+        <ion-card *ngFor="let field of entity.fields; let i = index">
+          <ion-card-header>
+            {{field.accessModifier.symbol}} {{field.name}}: {{field.type}}
+          </ion-card-header>
+          <ion-list>
+            <ion-item>
+              <ion-label>Name</ion-label>
+              <ion-input [name]="'entityField_' + i + '_name'" pattern="[a-zA-Z0-9_]*" type="text" required [(ngModel)]="field.name"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label>Type</ion-label>
+              <ion-input [name]="'entityField_' + i + '_type'" type="text" pattern="[a-zA-Z0-9_]*" required [(ngModel)]="field.type"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label>Accessor</ion-label>
+              <ion-select [name]="'entityField_' + i + '_accessModifier'" required [(ngModel)]="field.accessModifier">
+                <ion-option *ngFor="let fieldAccessor of fieldAccessors" [value]="fieldAccessor">{{fieldAccessor.name}}</ion-option>
+              </ion-select>
+            </ion-item>
+          </ion-list>
+        </ion-card>
+      </div>
+    </div>
+    <button [disabled]="!form.valid" ion-button type="submit">Create</button>
   </form>
 </ion-content>

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Header, Content, FabButton, FabContainer, List, ListHeader } from 'ionic-angular';
+import { Entity } from '../../entity.model';
 
 // Jointjs
 import * as $ from 'jquery';
@@ -15,27 +16,100 @@ import * as joint from '../../../node_modules/jointjs/dist/joint';
 export class DiagramComponent implements OnInit {
 
     text: string;
+    graph: joint.dia.Graph;
+    paper: joint.dia.Paper;
+    uml: any;
 
     constructor() {
         console.log('Hello DiagramComponent Component');
         this.text = 'Hello World';
+
+        this.createEntityCreationHook();
     }
 
     ngOnInit() {
-        var graph = new joint.dia.Graph();
+        this.createGraph();
+    }
 
-        var paper = new joint.dia.Paper({
+    ionViewWillLeave() {
+        console.log('ionViewWillLeave')
+    }
+    ionViewDidLeave() {
+        console.log('ionViewDidLeave')
+    }
+    ionViewWillUnload() {
+        console.log('ionViewWillUnload')
+    }
+    ionViewDidUnload() {
+        console.log('ionViewDidUnload')
+    }
+
+    createEntity(entityData: Entity) { }
+    createEntityCreationHook() {
+        this.createEntity = function (entityData: Entity) {
+            var newElem = {
+                position: { x: 300, y: 50 },
+                size: { width: 240, height: 100 },
+                name: entityData.name,
+                attributes: entityData.fields.map(f => 
+                    `${f.accessModifier.symbol} ${f.name}: ${f.type}`
+                ),
+                methods: entityData.methods.map(m => {
+                    const args = m.arguments.map(a => `${a.name}: ${a.type}`).join(', ');
+                    return `${m.accessModifier.symbol} ${m.name}(${args}): ${m.type}`;
+                }),
+                attrs: {
+                    '.uml-class-name-rect': {
+                        fill: '#feb662',
+                        stroke: '#ffffff',
+                        'stroke-width': 0.5
+                    },
+                    '.uml-class-attrs-rect, .uml-class-methods-rect': {
+                        fill: '#fdc886',
+                        stroke: '#fff',
+                        'stroke-width': 0.5
+                    },
+                    '.uml-class-attrs-text': {
+                        ref: '.uml-class-attrs-rect',
+                        'ref-y': 0.5,
+                        'y-alignment': 'middle'
+                    },
+                    '.uml-class-methods-text': {
+                        ref: '.uml-class-methods-rect',
+                        'ref-y': 0.5,
+                        'y-alignment': 'middle'
+                    }
+                }
+            };
+            const jointjsElem = ((entityType) => {
+                switch (entityType) {
+                    case 'Interface': return new this.uml.Interface(newElem);
+                    case 'Abstract': return new this.uml.Abstract(newElem);
+                    case 'Class': return new this.uml.Class(newElem);
+                }
+            })(entityData.entityType);
+            this.graph.addCell(jointjsElem);
+        }.bind(this);
+    }
+
+    createGraph() {
+        this.graph = new joint.dia.Graph();
+        this.paper = new joint.dia.Paper({
             el: $('#paper'),
             width: 800,
             height: 600,
             gridSize: 1,
-            model: graph
+            model: this.graph
         });
+        this.uml = joint.shapes.uml;
+        this.createInitialDiagram();
+    }
 
-        var uml: any = joint.shapes.uml;
-
+    createInitialDiagram() {
+        const uml = this.uml;
+        const graph = this.graph;
+        const paper = this.paper;
         var classes = {
-
             mammal: new uml.Interface({
                 position: { x: 300, y: 50 },
                 size: { width: 240, height: 100 },

@@ -16,5 +16,6 @@
 // automatically applied to the <body> element in the app.
 
 
-
-
+.no-scroll .scroll-content{
+    overflow: hidden;
+}
